@@ -1,28 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HarmonyLib;
+using Il2Cpp;
+using Il2CppTLD.IntBackedUnit;
 using MelonLoader;
-using UnityEngine;
-using Harmony;
+
 namespace LimitlessContainerSpace
 {
     public class Implementation : MelonMod
     {
-        public override void OnApplicationStart()
+        public override void OnInitializeMelon()
         {
-            base.OnApplicationStart();
-            Debug.Log($"[{Info.Name}] Version {Info.Version} loaded!");
+            LoggerInstance.Msg($"Version {Info.Version} loaded!");
         }
     }
 
-    [HarmonyPatch(typeof(Container), "Awake")]
-    internal class Container_Awake
+    [HarmonyPatch(typeof(Container), nameof(Container.Awake))]
+    internal static class Container_Awake
     {
+        private const float CapacityKG = 10000f;
+
         private static void Postfix(Container __instance)
         {
-            __instance.m_CapacityKG = 10000;
+            __instance.m_Capacity = ItemWeight.FromKilograms(CapacityKG);
         }
     }
 }
